@@ -1,4 +1,5 @@
 const inquirer = require('inquirer');
+const { getDepartments, getEmployees, getRoles } = require('./db/queries')
 
 
 const userPrompt = () => {
@@ -27,4 +28,7 @@ const recursiveFunction = () => {
     })
 }
 
-recursiveFunction();
+// recursiveFunction();
+// getDepartments();
+getEmployees();
+// getRoles();
