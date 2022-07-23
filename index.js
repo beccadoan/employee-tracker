@@ -10,7 +10,7 @@ const userPrompt = () => {
                 type: 'list',
                 name: 'nextAction',
                 message: 'Use input to select an option',
-                choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Quit']
+                choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add A Department', 'Add A Role', 'Add An Employee', 'Update An Employee Role', 'Quit']
               }
         )
 }
@@ -18,17 +18,22 @@ const userPrompt = () => {
 
 const recursiveFunction = () => {
     userPrompt().then(results => {
-        if (results.nextAction !== 'Quit') {
-            console.log(results.nextAction);
-            recursiveFunction()
-        } else {
-            console.log('Thanks for using our database!');
-
+        switch(results.nextAction) {
+            case 'View All Employees':
+                getEmployees().then(rows => {
+                    recursiveFunction();
+                })
+                break;
+            case 'View All Roles':
+                getRoles();
+                break;
+            case 'View All Departments':
+                getDepartments();
+                break;
+            default:
+                console.log('Thank you for using our database');
         }
     })
 }
 
-// recursiveFunction();
-// getDepartments();
-getEmployees();
-// getRoles();
+recursiveFunction();

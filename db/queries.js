@@ -4,12 +4,15 @@ const cTable = require('console.table');
 const getDepartments = () => {
     const sql = `
         SELECT * FROM department`;
-    db.query(sql, (err, rows) => {
-        if(err) {
-            console.log(err);
-            return;
-        } 
-        console.table(rows);
+    return new Promise((resolve, reject) => {
+        db.query(sql, (err, rows) => {
+            if(err) {
+                console.log(err);
+                reject('Rejected');
+            } 
+            console.table(rows);
+            resolve(rows);
+        })
     })
 }
 
@@ -19,12 +22,15 @@ const getRoles = () => {
         FROM role
         LEFT JOIN department
         ON role.department_id = department.id`;
-    db.query(sql, (err, rows) => {
-        if(err) {
-            console.log(err);
-            return;
-        } 
-        console.table(rows);
+    return new Promise((resolve, reject) => {
+        db.query(sql, (err, rows) => {
+            if(err) {
+                console.log(err);
+                reject('Rejected');
+            } 
+            console.table(rows);
+            resolve(rows);
+        })
     })
 }
 
@@ -35,12 +41,15 @@ const getEmployees = () => {
         LEFT JOIN department ON role.department_id = department.id
         LEFT JOIN employee b
         ON a.manager_id = b.id `
-    db.query(sql, (err, rows) => {
-        if(err) {
-            console.log(err);
-            return;
-        } 
-        console.table(rows);
+    return new Promise((resolve, reject) => {
+        db.query(sql, (err, rows) => {
+            if(err) {
+                console.log(err);
+                reject('Rejected');
+            } 
+            console.table(rows);
+            resolve(rows);
+        })
     })
 }
 
