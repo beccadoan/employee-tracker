@@ -53,5 +53,20 @@ const getEmployees = () => {
     })
 }
 
-module.exports = { getDepartments, getEmployees, getRoles };
+const addDepartment = ({ body }) => {
+    const sql = `INSERT INTO department (name)
+                 VALUES (?)`;
+    const params = [body.name];
+    return new Promise((resolve, reject) => {
+        db.query(sql, params, (err, result) => {
+            if(err) {
+                console.log(err);
+                reject('Rejected');
+            } 
+            resolve(result);
+        })
+    })
+}
+
+module.exports = { getDepartments, getEmployees, getRoles, addDepartment };
 
