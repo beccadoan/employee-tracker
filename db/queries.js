@@ -68,5 +68,50 @@ const addDepartment = ({ body }) => {
     })
 }
 
-module.exports = { getDepartments, getEmployees, getRoles, addDepartment };
+const addRole = ({ body }) => {
+    const sql = `INSERT INTO role (title, salary, department_id)
+                 VALUES (?,?,?)`;
+    const params = [body.title, body.salary, body.department_id];
+    return new Promise((resolve, reject) => {
+        db.query(sql, params, (err, result) => {
+            if(err) {
+                console.log(err);
+                reject('Rejected');
+            } 
+            resolve(result);
+        })
+    })
+}
+
+const addEmployee = ({ body }) => {
+    const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                 VALUES (?,?,?,?)`;
+    const params = [body.first_name, body.last_name, body.role_id, body.manager_id];
+    return new Promise((resolve, reject) => {
+        db.query(sql, params, (err, result) => {
+            if(err) {
+                console.log(err);
+                reject('Rejected');
+            } 
+            resolve(result);
+        })
+    })
+}
+
+const updateRole = ({ body }) => {
+    const sql = `UPDATE employee SET role_id = ?
+                 WHERE id = ?`;
+    const params = [body.role_id, body.id];
+    return new Promise((resolve, reject) => {
+        db.query(sql, params, (err, result) => {
+            if(err) {
+                console.log(err);
+                reject('Rejected');
+            } 
+            resolve(result);
+        })
+    })
+}
+
+module.exports = { getDepartments, getEmployees, getRoles, addDepartment, addRole, addEmployee, updateRole };
 
