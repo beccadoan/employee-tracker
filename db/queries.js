@@ -1,5 +1,4 @@
 const db = require('./connection');
-const cTable = require('console.table');
 
 const getDepartments = () => {
     const sql = `
@@ -10,7 +9,6 @@ const getDepartments = () => {
                 console.log(err);
                 reject('Rejected');
             } 
-            console.table(rows);
             resolve(rows);
         })
     })
@@ -28,7 +26,6 @@ const getRoles = () => {
                 console.log(err);
                 reject('Rejected');
             } 
-            console.table(rows);
             resolve(rows);
         })
     })
@@ -47,7 +44,6 @@ const getEmployees = () => {
                 console.log(err);
                 reject('Rejected');
             } 
-            console.table(rows);
             resolve(rows);
         })
     })

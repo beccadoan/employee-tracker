@@ -1,4 +1,5 @@
 const inquirer = require('inquirer');
+const cTable = require('console.table');
 const { getDepartments, getEmployees, getRoles, addDepartment, addRole, addEmployee, updateRole } = require('./db/queries')
 
 
@@ -15,6 +16,12 @@ const userPrompt = () => {
 }
 
 const newRolePrompt = () => {
+  var departments = [];
+    getDepartments().then(rows => {
+    rows.forEach(element => {
+      departments.push(element.name)
+    })
+  })
     return inquirer.prompt([
         {
             type: 'input',
@@ -43,19 +50,13 @@ const newRolePrompt = () => {
             }
           },
           {
-            type: 'input',
+            type: 'list',
             name: 'department_id',
-            message: 'Provide the department id for this role',
-            validate: nameInput => {
-                if (nameInput) {
-                  return true;
-                } else {
-                  console.log('Please enter department id');
-                  return false;
-                }
-            }
+            message: 'What department is this role in?',
+            choices: departments
           }
         ])
+      
 }
 
 const updateRolePrompt = () => {
@@ -107,6 +108,18 @@ const newDepartmentPrompt = () => {
 }
 
 const newEmployeePrompt = () => {
+  var employees = ['none'];
+    getEmployees().then(rows => {
+    rows.forEach(element => {
+      employees.push(element.first_name + ' ' + element.last_name)
+    })
+  })
+  var roles = [];
+    getRoles().then(rows => {
+    rows.forEach(element => {
+      roles.push(element.title)
+    })
+  })
     return inquirer.prompt([
         {
             type: 'input',
@@ -135,30 +148,16 @@ const newEmployeePrompt = () => {
             }
           },
           {
-            type: 'input',
+            type: 'list',
             name: 'role_id',
-            message: "Please enter employee's role id",
-            validate: nameInput => {
-                if (nameInput) {
-                  return true;
-                } else {
-                  console.log('Please enter role id');
-                  return false;
-                }
-            }
+            message: "Please choose employee role",
+            choices: roles
           },
           {
-            type: 'input',
+            type: 'list',
             name: 'manager_id',
-            message: "Please enter employee's manager id",
-            validate: nameInput => {
-                if (nameInput) {
-                  return true;
-                } else {
-                  console.log('Please enter manager id');
-                  return false;
-                }
-            }
+            message: "Please choose employee manager",
+            choices: employees
           }
         ])
 }
@@ -169,16 +168,23 @@ const recursiveFunction = () => {
         switch(results.nextAction) {
             case 'View All Employees':
                 getEmployees().then(rows => {
+                    console.table(rows);
                     recursiveFunction();
                 })
                 break;
             case 'View All Roles':
                 getRoles().then(rows => {
+                  console.table(rows);
+                  const roles = [];
+                  rows.forEach(element => {
+                    roles.push(element.title)
+                  });
                     recursiveFunction();
                 })
                 break;
             case 'View All Departments':
                 getDepartments().then(rows => {
+                    console.table(rows);
                     recursiveFunction();
                 })
                 break;
@@ -196,31 +202,46 @@ const recursiveFunction = () => {
                 break;
             case 'Add A Role':
                 newRolePrompt().then(response => {
+                  getDepartments().then(rows => {
+                    const newID = rows.find(x => x.name === response.department_id).id;
                     const body = {
                         title: response.title,
                         salary: response.salary,
-                        department_id: response.department_id
+                        department_id: newID
                     }
                     addRole({body}).then(res => {
                         getRoles().then(res => {
                             recursiveFunction();
                         });
                     })
+                  })
                 })
                 break;
             case 'Add An Employee':
                 newEmployeePrompt().then(response => {
+                    getRoles().then(rows => {
+                    const roleID = rows.find(x => x.title === response.role_id).id;
+                    getEmployees().then(employeeRow => {
+                    const manager = employeeRow.filter(employee => employee.first_name + ' ' + employee.last_name === response.manager_id);
+                    var newID;
+                    if(response.manager_id === 'none'){
+                      newID = undefined;
+                    } else{
+                    newID = manager[0].id;
+                    }
                     const body = {
                         first_name: response.first_name,
                         last_name: response.last_name,
-                        role_id: response.role_id,
-                        manager_id: response.manager_id
+                        role_id: roleID,
+                        manager_id: newID
                     }
                     addEmployee({body}).then(res => {
                         getEmployees().then(res => {
                             recursiveFunction();
                         });
                     })
+                  })
+                })
                 })
                 break;
             case 'Update An Employee Role':
