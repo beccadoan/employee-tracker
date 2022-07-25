@@ -16,7 +16,7 @@ const userPrompt = () => {
 }
 
 const newRolePrompt = () => {
-  var departments = [];
+  let departments = [];
     getDepartments().then(rows => {
     rows.forEach(element => {
       departments.push(element.name)
@@ -60,6 +60,12 @@ const newRolePrompt = () => {
 }
 
 const updateRolePrompt = () => {
+    let roles = [];
+    getRoles().then(rows => {
+    rows.forEach(element => {
+      roles.push(element.title)
+      })
+    })
     return inquirer.prompt([
         {
             type: 'input',
@@ -75,17 +81,10 @@ const updateRolePrompt = () => {
             }
           },
           {
-            type: 'input',
+            type: 'list',
             name: 'role_id',
-            message: 'What is the new role id of this employee',
-            validate: nameInput => {
-                if (nameInput) {
-                  return true;
-                } else {
-                  console.log('Please enter the role id');
-                  return false;
-                }
-            }
+            message: 'What is the new role?',
+            choices: roles
           }
         ])
 }
@@ -108,13 +107,13 @@ const newDepartmentPrompt = () => {
 }
 
 const newEmployeePrompt = () => {
-  var employees = ['none'];
+  let employees = ['none'];
     getEmployees().then(rows => {
     rows.forEach(element => {
       employees.push(element.first_name + ' ' + element.last_name)
     })
   })
-  var roles = [];
+  let roles = [];
     getRoles().then(rows => {
     rows.forEach(element => {
       roles.push(element.title)
@@ -223,7 +222,7 @@ const recursiveFunction = () => {
                     const roleID = rows.find(x => x.title === response.role_id).id;
                     getEmployees().then(employeeRow => {
                     const manager = employeeRow.filter(employee => employee.first_name + ' ' + employee.last_name === response.manager_id);
-                    var newID;
+                    let newID;
                     if(response.manager_id === 'none'){
                       newID = undefined;
                     } else{
@@ -246,15 +245,18 @@ const recursiveFunction = () => {
                 break;
             case 'Update An Employee Role':
                 updateRolePrompt().then(response => {
+                  getRoles.then(rows => {
+                    const roleID = rows.find(x => x.title === response.role_id).id;
                     const body = {
                         id: response.id,
-                        role_id: response.role_id
+                        role_id: roleID
                     }
                     updateRole({body}).then(res => {
                         getEmployees().then(res => {
                             recursiveFunction();
                         });
                     })
+                  })
                 })
                 break;
             default:
