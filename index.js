@@ -59,26 +59,13 @@ const newRolePrompt = () => {
       
 }
 
-const updateRolePrompt = () => {
-    let roles = [];
-    getRoles().then(rows => {
-    rows.forEach(element => {
-      roles.push(element.title)
-      })
-    })
+const updateRolePrompt = (employees, roles) => {
     return inquirer.prompt([
         {
-            type: 'input',
+            type: 'list',
             name: 'id',
             message: 'What is the employee id of the employee you would like to update',
-            validate: nameInput => {
-                if (nameInput) {
-                  return true;
-                } else {
-                  console.log('Please enter the employee id');
-                  return false;
-                }
-            }
+            choices: employees
           },
           {
             type: 'list',
@@ -244,19 +231,29 @@ const recursiveFunction = () => {
                 })
                 break;
             case 'Update An Employee Role':
-                updateRolePrompt().then(response => {
-                  getRoles.then(rows => {
-                    const roleID = rows.find(x => x.title === response.role_id).id;
-                    const body = {
-                        id: response.id,
-                        role_id: roleID
-                    }
+              let employees = [];
+              getEmployees().then(rows => {
+              rows.forEach(element => {
+                employees.push({name:element.first_name + ' ' + element.last_name, value: element.id})
+              })
+            let roles = [];
+              getRoles().then(res => {
+              res.forEach(element => {
+                roles.push({name: element.title, value: element.id})
+              })
+            
+                updateRolePrompt(employees, roles).then(response => {
+                  console.log(response);
+
+                  const body = {
+                    id: response.id,
+                    role_id: response.role_id
+                }
                     updateRole({body}).then(res => {
-                        getEmployees().then(res => {
-                            recursiveFunction();
-                        });
+                      recursiveFunction();
                     })
-                  })
+                })
+              })
                 })
                 break;
             default:
