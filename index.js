@@ -243,7 +243,6 @@ const recursiveFunction = () => {
               })
             
                 updateRolePrompt(employees, roles).then(response => {
-                  console.log(response);
 
                   const body = {
                     id: response.id,
